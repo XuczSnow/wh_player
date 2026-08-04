@@ -10,3 +10,6 @@
 
 # 保留示例页
 !example.html
+
+# 保留README
+!README.md
