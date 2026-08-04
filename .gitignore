@@ -1,0 +1,12 @@
+# 默认忽略所有文件
+*
+
+# 保留gitignore本身
+!.gitignore
+
+# 保留播放器目录
+!wh_player/
+!wh_player/**
+
+# 保留示例页
+!example.html
