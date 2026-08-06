@@ -98,7 +98,7 @@ def extract_lyrics(audio):
 
     return ""
 
-for f in MUSIC_DIR.iterdir():
+for f in MUSIC_DIR.rglob("*"):
 
     if f.suffix.lower() not in {
         ".mp3", ".flac", ".m4a",

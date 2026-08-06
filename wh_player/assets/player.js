@@ -505,102 +505,123 @@ document.addEventListener(
 // 拖动播放器
 // =========================
 
-const player =
-    document.getElementById(
-        "wh-player"
-    );
-
-const dragHandle =
-    document.querySelector(
-        ".meta"
-    );
+const player = document.getElementById("wh-player");
+const dragHandle = document.querySelector(".meta");
 
 let isDragging = false;
 let offsetX = 0;
 let offsetY = 0;
 
-// 恢复位置
+const isMobile = window.matchMedia("(max-width:768px)").matches;
 
-const savedPosition =
-    localStorage.getItem(
-        "player-position"
+// =========================
+// 桌面端允许拖动
+// =========================
+
+if (!isMobile) {
+
+    const savedPosition = localStorage.getItem("player-position");
+
+    if (savedPosition) {
+        const pos = JSON.parse(savedPosition);
+        player.style.left = "auto";
+        player.style.top = "auto";
+        player.style.right = `${pos.right}px`;
+        player.style.bottom = `${pos.bottom}px`;
+    }
+
+    dragHandle.addEventListener(
+        "mousedown",
+        (e) => {
+            isDragging = true;
+            const rect = player.getBoundingClientRect();
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top;
+        }
     );
 
-if (savedPosition) {
+    document.addEventListener(
+        "mousemove",
+        (e) => {
 
-    const pos =
-        JSON.parse(savedPosition);
+            if (!isDragging)
+                return;
 
-    player.style.left =
-        pos.left;
+            const left = e.clientX - offsetX;
+            const top = e.clientY - offsetY;
 
-    player.style.top =
-        pos.top;
+            const right = window.innerWidth - left - player.offsetWidth;
+            const bottom = window.innerHeight - top - player.offsetHeight;
+            const safeRight =
+                Math.max(
+                    0,
+                    Math.min(
+                        right,
+                        window.innerWidth -
+                        player.offsetWidth
+                    )
+                );
 
-    player.style.right =
-        "auto";
+            const safeBottom =
+                Math.max(
+                    0,
+                    Math.min(
+                        bottom,
+                        window.innerHeight -
+                        player.offsetHeight
+                    )
+                );
 
-    player.style.bottom =
-        "auto";
+            player.style.left = "auto";
+            player.style.top = "auto";
+            player.style.right = `${safeRight}px`;
+            player.style.bottom = `${safeBottom}px`;
+        }
+    );
+
+    document.addEventListener(
+        "mouseup",
+        () => {
+
+            if (!isDragging)
+                return;
+
+            isDragging = false;
+
+            const rect = player.getBoundingClientRect();
+
+            localStorage.setItem(
+                "player-position",
+                JSON.stringify({
+                    right:
+                        window.innerWidth - rect.right,
+                    bottom:
+                        window.innerHeight - rect.bottom
+                })
+            );
+        }
+    );
+
+    window.addEventListener(
+        "resize",
+        () => {
+
+            const saved = localStorage.getItem("player-position");
+
+            if (!saved)
+                return;
+
+            const pos = JSON.parse(saved);
+
+            player.style.left = "auto";
+            player.style.top = "auto";
+            player.style.right = `${pos.right}px`;
+            player.style.bottom = `${pos.bottom}px`;
+        }
+    );
+} else {
+    player.style.left = "0";
+    player.style.right = "0";
+    player.style.top = "auto";
+    player.style.bottom = "0";
 }
-
-dragHandle.addEventListener(
-    "mousedown",
-    (e) => {
-
-        isDragging = true;
-
-        const rect =
-            player.getBoundingClientRect();
-
-        offsetX =
-            e.clientX - rect.left;
-
-        offsetY =
-            e.clientY - rect.top;
-
-        player.style.right =
-            "auto";
-
-        player.style.bottom =
-            "auto";
-    }
-);
-
-document.addEventListener(
-    "mousemove",
-    (e) => {
-
-        if (!isDragging)
-            return;
-
-        player.style.left =
-            `${e.clientX - offsetX}px`;
-
-        player.style.top =
-            `${e.clientY - offsetY}px`;
-    }
-);
-
-document.addEventListener(
-    "mouseup",
-    () => {
-
-        if (!isDragging)
-            return;
-
-        isDragging = false;
-
-        localStorage.setItem(
-            "player-position",
-            JSON.stringify({
-
-                left:
-                    player.style.left,
-
-                top:
-                    player.style.top
-            })
-        );
-    }
-);

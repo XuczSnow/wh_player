@@ -1,8 +1,8 @@
-:root{
-    --accent:#4A90E2;
+:root {
+    --accent: #4A90E2;
 }
 
-.meta{
+.meta {
     cursor: move;
     user-select: none;
 }
@@ -20,7 +20,8 @@
     right: 20px;
     bottom: 80px;
 
-    width: 480px;
+    width: min(480px, calc(100vw - 40px));
+    max-width: calc(100vw - 40px);
 
     display: flex;
     box-sizing: border-box;
@@ -52,7 +53,7 @@
     z-index: 99999;
 }
 
-#wh-player:hover{
+#wh-player:hover {
 
     transform: translateY(-2px);
 
@@ -254,8 +255,7 @@
     background: white;
 
     box-shadow:
-        0 0 8px
-        rgba(0,0,0,.2);
+        0 0 8px rgba(0, 0, 0, .2);
 }
 
 .controls {
@@ -326,18 +326,17 @@
         blur(24px);
 
     border:
-        1px solid rgba(255,255,255,.06);
+        1px solid rgba(255, 255, 255, .06);
 
     box-shadow:
-        0 10px 30px rgba(0,0,0,.25);
+        0 10px 30px rgba(0, 0, 0, .25);
 
     visibility: hidden;
 
     pointer-events: none;
 
     transform:
-        translateY(20px)
-        scale(0.96);
+        translateY(20px) scale(0.96);
 
     opacity: 0;
 
@@ -358,8 +357,7 @@
     pointer-events: auto;
 
     transform:
-        translateY(0)
-        scale(1);
+        translateY(0) scale(1);
 
     opacity: 1;
 }
@@ -382,7 +380,7 @@
 .theme-item:hover {
 
     background:
-        rgba(255,255,255,.08);
+        rgba(255, 255, 255, .08);
 }
 
 .theme-color {
@@ -393,8 +391,7 @@
 
     flex-shrink: 0;
 
-    border: 2px solid
-        rgba(255,255,255,.15);
+    border: 2px solid rgba(255, 255, 255, .15);
 }
 
 .theme-color.sky {
@@ -444,18 +441,17 @@
         blur(24px);
 
     border:
-        1px solid rgba(255,255,255,.06);
+        1px solid rgba(255, 255, 255, .06);
 
     box-shadow:
-        0 10px 30px rgba(0,0,0,.25);
+        0 10px 30px rgba(0, 0, 0, .25);
 
     visibility: hidden;
 
     pointer-events: none;
 
     transform:
-        translateY(20px)
-        scale(0.96);
+        translateY(20px) scale(0.96);
 
     opacity: 0;
 
@@ -476,10 +472,32 @@
     pointer-events: auto;
 
     transform:
-        translateY(0)
-        scale(1);
+        translateY(0) scale(1);
 
     opacity: 1;
+}
+
+#playlist-panel::-webkit-scrollbar {
+
+    width: 4px;
+}
+
+#playlist-panel::-webkit-scrollbar-thumb {
+
+    border-radius: 999px;
+
+    background:
+        color-mix(
+            in srgb,
+            var(--accent) 40%,
+            white
+        );
+}
+
+#playlist-panel::-webkit-scrollbar-thumb:hover {
+
+    background:
+        var(--accent);
 }
 
 .playlist-item {
@@ -498,21 +516,22 @@
 
     transition: all .25s ease;
 
-    color: rgba(255,255,255,.8);
+    color: rgba(255, 255, 255, .8);
 }
 
 .playlist-item:hover {
 
     background:
-        rgba(255,255,255,.06);
+        rgba(255, 255, 255, .06);
 
     transform:
         translateX(4px);
 }
+
 .playlist-item:hover {
 
     background:
-        rgba(255,255,255,.08);
+        rgba(255, 255, 255, .08);
 }
 
 .playlist-item.active {
@@ -550,5 +569,19 @@
 
     to {
         transform: rotate(360deg);
+    }
+}
+
+@media screen and (max-width: 768px) {
+    #wh-player {
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        max-width: 100%;
+        border-radius: 12px 12px 0 0;
+        margin: 0;
+        padding: 10px;
+        box-sizing: border-box;
     }
 }
