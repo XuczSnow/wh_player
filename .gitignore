@@ -1,15 +1,24 @@
-# 默认忽略所有文件
+# =========================================================
+#  根 .gitignore — "全忽略 + 白名单"策略
+#  默认忽略所有文件，仅放行播放器工程必需文件
+#  wh_player/ 内的用户媒体数据由 wh_player/.gitignore 负责忽略
+# =========================================================
+
 *
 
-# 保留gitignore本身
+# 版本控制自身
 !.gitignore
 
-# 保留播放器目录
-!wh_player/
-!wh_player/**
+# 项目文档 / 许可 / 依赖声明
+!README.md
+!LICENSE
+!requirements.txt
 
-# 保留示例页
+# 示例页
 !example.html
 
-# 保留README
-!README.md
+# 播放器组件：assets/（8 个 JS 模块 + player.css + test.js + package.json）、
+# 生成脚本 generate_music_json.py、内层 .gitignore、目录占位 .gitkeep
+# （wh_player/ 内的 media 数据再由内层 wh_player/.gitignore 叠加忽略）
+!wh_player/
+!wh_player/**

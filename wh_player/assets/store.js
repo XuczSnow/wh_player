@@ -1,0 +1,113 @@
+/**
+ * 持久化 mixin — 管理 localStorage 状态 / 位置 / 主题
+ * 通过 this 访问 WishPlayer 实例的 state / dom / cfg
+ */
+
+import { THEMES, isValidTheme } from "./utils.js";
+
+export function applyStoreMixin(WishPlayer) {
+
+  /** 应用主题：只改 CSS 变量并持久化 */
+  WishPlayer.prototype._applyTheme = function (name) {
+    if (!isValidTheme(name)) return;
+    document.documentElement.style.setProperty("--wh-accent", THEMES[name].accent);
+    localStorage.setItem(this._key("theme"), name);
+  };
+
+
+  /** 带版本后缀的 key */
+  WishPlayer.prototype._key = function (n) {
+    return `${this.cfg.storagePrefix}-${n}-v1`;
+  };
+
+  /** 保存当前播放状态 */
+  WishPlayer.prototype._saveState = function () {
+    this._lastSave = Date.now();
+    localStorage.setItem(this._key("state"), JSON.stringify({
+      version:     1,
+      current:     this.state.current,
+      currentTime: this._dom.audio.currentTime,
+      paused:      this._dom.audio.paused,
+    }));
+  };
+
+  /** 从 localStorage 恢复播放状态（在 _init 中调用）*/
+  WishPlayer.prototype._restoreState = function () {
+    try {
+      const raw = localStorage.getItem(this._key("state"));
+      if (!raw) return false;
+      const s = JSON.parse(raw);
+      if (s.version !== 1 || s.current >= this.state.playlist.length)
+        return false;
+
+      this._loadSong(s.current);
+
+      // 走 this._on 注册，destroy() 时自动清理
+      this._on(this._dom.audio, "loadedmetadata", () => {
+        this._dom.audio.currentTime = s.currentTime || 0;
+        if (!s.paused) {
+          this._dom.audio.play().then(() => {
+            this._setPlayIcon(true);
+            this._dom.record.classList.add("playing");
+          }).catch(() => {
+            this.state.needResume = true;
+            this._setPlayIcon(false);
+            this._dom.record.classList.remove("playing");
+            this._dom.lyricCurrent.textContent = "▶ 点击继续收听";
+          });
+        }
+      }, { once: true });
+
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  /** 保存播放器位置 */
+  WishPlayer.prototype._savePosition = function () {
+    const r = this._dom.player.getBoundingClientRect();
+    localStorage.setItem(this._key("position"), JSON.stringify({
+      right:  window.innerWidth  - r.right,
+      bottom: window.innerHeight - r.bottom,
+    }));
+  };
+
+  /** 恢复播放器位置（含类型守卫 + viewport clamp）*/
+  WishPlayer.prototype._restorePosition = function () {
+    if (window.matchMedia("(max-width:768px)").matches) return;
+    try {
+      const raw = localStorage.getItem(this._key("position"));
+      if (!raw) return;
+      const pos = JSON.parse(raw);
+      if (typeof pos?.right !== "number" || typeof pos?.bottom !== "number")
+        return;
+
+      const p = this._dom.player;
+      p.style.left   = "auto";
+      p.style.top    = "auto";
+      p.style.right  = pos.right + "px";
+      p.style.bottom = pos.bottom + "px";
+
+      this._clampToViewport();
+    } catch {
+      /* 忽略损坏数据 */
+    }
+  };
+
+  /** 将播放器夹回视口（窗口 resize 后调用）*/
+  WishPlayer.prototype._clampToViewport = function () {
+    const p = this._dom.player;
+    const r = p.getBoundingClientRect();
+    if (r.right > window.innerWidth)
+      p.style.right = Math.max(0, window.innerWidth - r.width) + "px";
+    if (r.bottom > window.innerHeight)
+      p.style.bottom = Math.max(0, window.innerHeight - r.height) + "px";
+  };
+
+  /** resize 事件入口 */
+  WishPlayer.prototype._clampPosition = function () {
+    if (window.matchMedia("(max-width:768px)").matches) return;
+    this._restorePosition();
+  };
+}

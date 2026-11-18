@@ -1,85 +1,37 @@
-# =========================
 # Python
-# =========================
-
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
-
 .venv/
 venv/
 env/
 
-# =========================
 # IDE
-# =========================
-
 .vscode/
 .idea/
-
 *.swp
 *.swo
 
-# =========================
 # OS
-# =========================
-
 .DS_Store
 Thumbs.db
 
-# =========================
-# Logs
-# =========================
-
+# 日志 / 构建 / 临时 / 本地配置
 *.log
-
-# =========================
-# Build
-# =========================
-
 dist/
 build/
-
-# =========================
-# Music Scanner Cache
-# =========================
-
-music.json
-
-# 如果 music.json 需要提交，则删除上面这一行
-
-# =========================
-# Generated Assets
-# =========================
-
-music/*
-!music/.gitkeep
-
-covers/*
-!covers/.gitkeep
-
-lyrics/*
-!lyrics/.gitkeep
-
-# 如果只忽略部分格式，可改为：
-
-# *.mp3
-# *.flac
-# *.wav
-# *.m4a
-
-# =========================
-# Temporary Files
-# =========================
-
 *.tmp
 *.bak
 *.cache
-
-# =========================
-# Local Config
-# =========================
-
 .env
 .env.local
+
+# 播放清单与生成资源（可由 generate_music_json.py 从 music/ 重新生成）
+music.json
+music/*
+!music/.gitkeep
+covers/*
+!covers/.gitkeep
+lyrics/*
+!lyrics/.gitkeep

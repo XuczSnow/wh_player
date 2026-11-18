@@ -1,136 +1,178 @@
-<!DOCTYPE HTML>
-<html>
+<!DOCTYPE html>
+<html lang="zh-CN">
 
 <head>
-	<title>Wish home player</title>
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
-	<link rel="stylesheet" href="wh_player/assets/player.css" />
-	<style>
-		body {
-			margin: 0;
-			min-height: 100vh;
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <meta name="description" content="Wish House Player Demo">
+  <title>Wish home player</title>
 
-			background:
-				linear-gradient(135deg,
-					#242943,
-					#2f3551,
-					#363d60);
+  <!-- Font Awesome（CDN） -->
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
-			font-family:
-				"Segoe UI",
-				Arial,
-				sans-serif;
+  <!-- 播放器样式 -->
+  <link rel="stylesheet" href="wh_player/assets/player.css">
 
-			display: flex;
-			align-items: center;
-			justify-content: center;
-		}
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #242943, #2f3551, #363d60);
+      font-family: "Segoe UI", Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-		.hero {
-			text-align: center;
-			color: white;
-		}
-
-		.hero h1 {
-			font-size: 4rem;
-			margin: 0;
-		}
-
-		.hero p {
-			opacity: .75;
-		}
-	</style>
+    .hero { text-align: center; color: white; }
+    .hero h1 { font-size: 4rem; margin: 0; }
+    .hero p  { opacity: 0.75; }
+  </style>
 </head>
 
 <body>
-	<div class="hero">
-		<h1>许愿屋</h1>
-		<p>Wish House Player Demo</p>
-	</div>
-	<div id="wh-player">
-		<div class="record">
-			<img id="cover" src="wh_player/covers/default-cover.jpg" altnfo>
-		</div>
-		<div class="plyer_content">
-			<div class="meta">
-				<div id="song-name">未播放</div>
-				<div id="lyrics-container">
-					<div id="lyric-current">暂无歌词</div>
-					<div id="lyric-next"></div>
-				</div>
-			</div>
 
-			<div class="progress-wrap">
-				<div id="progress-bar">
-					<div id="progress-fill"></div>
-				</div>
-			</div>
+  <div class="hero">
+    <h1>许愿屋</h1>
+    <p>Wish House Player Demo</p>
+  </div>
 
-			<div class="controls">
-				<button id="prev">
-					<i class="fas fa-step-backward"></i>
-				</button>
+  <!--
+    data-music-source 可覆盖默认的 music.json 路径
+    <audio> 放在容器内部，JS 通过 root.querySelector 查找（组件隔离）
+  -->
+  <div id="wh-player" data-wh-player data-music-source="wh_player/music.json">
 
-				<button id="play">
-					<i class="fas fa-play"></i>
-				</button>
+    <!-- 黑胶 + 封面 -->
+    <div class="record">
+      <img id="cover"
+           src="wh_player/covers/default-cover.jpg"
+           alt="专辑封面"
+           width="80" height="80">
+    </div>
 
-				<button id="next">
-					<i class="fas fa-step-forward"></i>
-				</button>
+    <!-- 内容区 -->
+    <div class="player_content">
 
-				<button id="theme-btn">
-					<i class="fas fa-palette"></i>
-				</button>
+      <div class="meta">
+        <div id="song-name">未播放</div>
+        <div id="lyrics-container">
+          <div id="lyric-current">暂无歌词</div>
+          <div id="lyric-next"></div>
+        </div>
+      </div>
 
-				<button id="playlist-btn">
-					<i class="fas fa-list"></i>
-				</button>
-			</div>
-		</div>
-		<div id="theme-panel">
+      <div class="progress-wrap">
+        <div id="progress-bar"
+             role="slider"
+             aria-label="播放进度"
+             aria-valuemin="0"
+             aria-valuemax="100"
+             aria-valuenow="0"
+             tabindex="0">
+          <div id="progress-fill"></div>
+        </div>
+      </div>
 
-			<div class="theme-item" data-theme="sky">
-				<span class="theme-color sky"></span>
-				Sky Blue
-			</div>
+      <div class="controls">
+        <button id="prev"
+                aria-label="上一首"
+                title="上一首">
+          <i class="fas fa-step-backward"></i>
+        </button>
 
-			<div class="theme-item" data-theme="lavender">
-				<span class="theme-color lavender"></span>
-				Lavender Mist
-			</div>
+        <button id="play"
+                aria-label="播放 / 暂停"
+                title="播放 / 暂停">
+          <i class="fas fa-play"></i>
+        </button>
 
-			<div class="theme-item" data-theme="coral">
-				<span class="theme-color coral"></span>
-				Coral Sunset
-			</div>
+        <button id="next"
+                aria-label="下一首"
+                title="下一首">
+          <i class="fas fa-step-forward"></i>
+        </button>
 
-			<div class="theme-item" data-theme="sand">
-				<span class="theme-color sand"></span>
-				Golden Sand
-			</div>
+        <button id="random-btn"
+                class="active"
+                aria-label="随机 / 顺序播放"
+                title="随机播放（点击切换为顺序）">
+          <i class="fas fa-shuffle"></i>
+        </button>
 
-			<div class="theme-item" data-theme="aurora">
-				<span class="theme-color aurora"></span>
-				Aurora Blue
-			</div>
+        <button id="theme-btn"
+                aria-label="切换主题"
+                title="切换主题">
+          <i class="fas fa-palette"></i>
+        </button>
 
-			<div class="theme-item" data-theme="mint">
-				<span class="theme-color mint"></span>
-				Mint Green
-			</div>
+        <button id="playlist-btn"
+                aria-label="播放列表"
+                title="播放列表">
+          <i class="fas fa-list"></i>
+        </button>
 
-		</div>
-		<div id="playlist-panel"></div>
-	</div>
+        <div class="volume-group">
+          <button id="mute-btn"
+                  aria-label="静音"
+                  title="静音">
+            <i class="fas fa-volume-up"></i>
+          </button>
+          <input id="volume-slider"
+                 type="range"
+                 min="0" max="100" value="80"
+                 aria-label="音量">
+        </div>
+      </div>
 
-	<audio id="audio"></audio>
+    </div>
 
-	<!-- Scripts -->
-	<script src="wh_player/assets/player.js"></script>
+    <!-- 主题面板 -->
+    <div id="theme-panel" role="listbox" aria-label="主题选择">
+      <div class="theme-item" data-theme="sky"
+           role="option" tabindex="0">
+        <span class="theme-color sky"></span>
+        Sky Blue
+      </div>
+      <div class="theme-item" data-theme="lavender"
+           role="option" tabindex="0">
+        <span class="theme-color lavender"></span>
+        Lavender Mist
+      </div>
+      <div class="theme-item" data-theme="coral"
+           role="option" tabindex="0">
+        <span class="theme-color coral"></span>
+        Coral Sunset
+      </div>
+      <div class="theme-item" data-theme="sand"
+           role="option" tabindex="0">
+        <span class="theme-color sand"></span>
+        Golden Sand
+      </div>
+      <div class="theme-item" data-theme="aurora"
+           role="option" tabindex="0">
+        <span class="theme-color aurora"></span>
+        Aurora Blue
+      </div>
+      <div class="theme-item" data-theme="mint"
+           role="option" tabindex="0">
+        <span class="theme-color mint"></span>
+        Mint Green
+      </div>
+    </div>
+
+    <!-- 播放列表面板 -->
+    <div id="playlist-panel"
+         role="list"
+         aria-label="播放列表"></div>
+
+    <!-- 音频元素放在容器内部，JS 通过 root.querySelector("#audio") 查找 -->
+    <audio id="audio" preload="metadata"></audio>
+
+  </div>
+
+  <script type="module" src="wh_player/assets/index.js"></script>
 
 </body>
-
 </html>

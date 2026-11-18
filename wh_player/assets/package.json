@@ -1,0 +1,10 @@
+{
+  "name": "wh-player",
+  "version": "2.3.0",
+  "description": "Wish House Player — ES Module 版播放器组件",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "node test.js"
+  }
+}
