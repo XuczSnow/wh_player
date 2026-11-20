@@ -28,6 +28,10 @@ export function applyStoreMixin(WishPlayer) {
       current:     this.state.current,
       currentTime: this._dom.audio.currentTime,
       paused:      this._dom.audio.paused,
+      // #5：一并持久化音量 / 静音 / 随机模式，刷新后可完整恢复
+      volume:      this.state.volume,
+      muted:       this.state.muted,
+      randomMode:  this.state.randomMode,
     }));
   };
 
@@ -42,21 +46,47 @@ export function applyStoreMixin(WishPlayer) {
 
       this._loadSong(s.current);
 
-      // 走 this._on 注册，destroy() 时自动清理
-      this._on(this._dom.audio, "loadedmetadata", () => {
-        this._dom.audio.currentTime = s.currentTime || 0;
+      const a = this._dom.audio;
+      // #1：seek + 自动续播。元数据可能已缓存（readyState>=1），此时
+      // loadedmetadata 不会再触发，须直接执行；否则才挂一次性事件
+      const applyResume = () => {
+        a.currentTime = s.currentTime || 0;
         if (!s.paused) {
-          this._dom.audio.play().then(() => {
+          a.play().then(() => {
             this._setPlayIcon(true);
             this._dom.record.classList.add("playing");
           }).catch(() => {
             this.state.needResume = true;
             this._setPlayIcon(false);
             this._dom.record.classList.remove("playing");
-            this._dom.lyricCurrent.textContent = "▶ 点击继续收听";
+            // #6：仅在歌词确实为空时提示"点击继续收听"，避免覆盖歌名占位
+            if (this.state.lyrics.length === 0)
+              this._dom.lyricCurrent.textContent = "▶ 点击继续收听";
           });
         }
-      }, { once: true });
+      };
+
+      if (a.readyState >= 1) {
+        applyResume();
+      } else {
+        // 走 this._on 注册，destroy() 时自动清理
+        this._on(a, "loadedmetadata", applyResume, { once: true });
+      }
+
+      // #5：恢复音量 / 随机模式 / 静音
+      if (typeof s.volume === "number") this._setVolume(s.volume);
+      if (typeof s.randomMode === "boolean") {
+        this.state.randomMode = s.randomMode;
+        this._dom.randomBtn?.classList.toggle("active", this.state.randomMode);
+        if (this._dom.randomBtn)
+          this._dom.randomBtn.title =
+            this.state.randomMode ? "随机播放" : "顺序播放";
+      }
+      if (typeof s.muted === "boolean") {
+        a.muted = s.muted;
+        this.state.muted = s.muted;
+        this._updateMuteIcon();
+      }
 
       return true;
     } catch {
